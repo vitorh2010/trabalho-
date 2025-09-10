@@ -1,3 +1,32 @@
-git clone https://github.com/SEU_USUARIO/coleta-inteligente-lixo.git
-cd coleta-inteligente-lixo
+from datetime import datetime, timedelta
+import time
 
+# Configuração
+hora_inicio = 6   # 6h da manhã
+hora_fim = 22     # 22h da noite
+intervalo_coleta = 5  # horas
+proxima_coleta = hora_inicio
+
+# Simulação de sensores
+pontos_lixo = {"Rua A": 60, "Rua B": 40, "Rua C": 90}  # valores em %
+
+while True:
+    agora = datetime.now()
+    hora_atual = agora.hour
+
+    if hora_inicio <= hora_atual < hora_fim:
+        if hora_atual >= proxima_coleta:
+            # IA simples: prioriza pontos com mais lixo
+            pontos_prioritarios = sorted(pontos_lixo.items(), key=lambda x: x[1], reverse=True)
+            print(f"[{agora.strftime('%H:%M')}] Coletando lixo nos pontos:")
+            for ponto, nivel in pontos_prioritarios:
+                if nivel > 50:  # coleta se nível > 50%
+                    print(f" - {ponto} (nível {nivel}%)")
+                    pontos_lixo[ponto] = 0  # lixo coletado
+
+            # agenda próxima coleta
+            proxima_coleta += intervalo_coleta
+    else:
+        print(f"[{agora.strftime('%H:%M')}] Sistema em repouso (noite)")
+
+    time.sleep(60)  # espera 1 minuto antes da próxima verificação
